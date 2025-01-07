@@ -1,14 +1,17 @@
 package org.example.cards
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cards.composeapp.generated.resources.Res
-import cards.composeapp.generated.resources.compose_multiplatform
+import cards.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.painterResource
 
 class Card(number: Int, type: Int) {
@@ -17,8 +20,10 @@ class Card(number: Int, type: Int) {
         "Clubs" -> "♣"
         "Diamonds" -> "♦"
         "Hearts" -> "♥"
-        else -> "♠"
+        "Spades" -> "♠"
+        else -> "Joker"
     }
+    //setup values
     val value = when (number) {
         1 -> "A"
         2 -> "2"
@@ -33,24 +38,103 @@ class Card(number: Int, type: Int) {
         11 -> "J"
         12 -> "Q"
         13 -> "K"
-        else -> "Unknown"
+        else -> "Joker"
     }
+    //setup images
     val image = when (number) {
-        1 -> "ace_of_clubs"
-        2 -> "two_of_clubs"
-        3 -> "three_of_clubs"
-        4 -> "four_of_clubs"
-        5 -> "five_of_clubs"
-        6 -> "six_of_clubs"
-        7 -> "seven_of_clubs"
-        8 -> "eight_of_clubs"
-        9 -> "nine_of_clubs"
-        10 -> "ten_of_clubs"
-        11 -> "jack_of_clubs"
-        12 -> "queen_of_clubs"
-        13 -> "king_of_clubs"
-        else -> "unknown"
+        1 -> when (suit) {
+            "Clubs" -> Res.drawable.ace_of_clubs
+            "Diamonds" -> Res.drawable.ace_of_diamonds
+            "Hearts" -> Res.drawable.ace_of_hearts
+            else -> Res.drawable.ace_of_spades
+        }
+
+        2 -> when (suit) {
+            "Clubs" -> Res.drawable._2_of_clubs
+            "Diamonds" -> Res.drawable._2_of_diamonds
+            "Hearts" -> Res.drawable._2_of_hearts
+            else -> Res.drawable._2_of_spades
+        }
+
+        3 -> when (suit) {
+            "Clubs" -> Res.drawable._3_of_clubs
+            "Diamonds" -> Res.drawable._3_of_diamonds
+            "Hearts" -> Res.drawable._3_of_hearts
+            else -> Res.drawable._3_of_spades
+        }
+
+        4 -> when (suit) {
+            "Clubs" -> Res.drawable._4_of_clubs
+            "Diamonds" -> Res.drawable._4_of_diamonds
+            "Hearts" -> Res.drawable._4_of_hearts
+            else -> Res.drawable._4_of_spades
+        }
+
+        5 -> when (suit) {
+            "Clubs" -> Res.drawable._5_of_clubs
+            "Diamonds" -> Res.drawable._5_of_diamonds
+            "Hearts" -> Res.drawable._5_of_hearts
+            else -> Res.drawable._5_of_spades
+        }
+
+        6 -> when (suit) {
+            "Clubs" -> Res.drawable._6_of_clubs
+            "Diamonds" -> Res.drawable._6_of_diamonds
+            "Hearts" -> Res.drawable._6_of_hearts
+            else -> Res.drawable._6_of_spades
+        }
+
+        7 -> when (suit) {
+            "Clubs" -> Res.drawable._7_of_clubs
+            "Diamonds" -> Res.drawable._7_of_diamonds
+            "Hearts" -> Res.drawable._7_of_hearts
+            else -> Res.drawable._7_of_spades
+        }
+
+        8 -> when (suit) {
+            "Clubs" -> Res.drawable._8_of_clubs
+            "Diamonds" -> Res.drawable._8_of_diamonds
+            "Hearts" -> Res.drawable._8_of_hearts
+            else -> Res.drawable._8_of_spades
+        }
+
+        9 -> when (suit) {
+            "Clubs" -> Res.drawable._9_of_clubs
+            "Diamonds" -> Res.drawable._9_of_diamonds
+            "Hearts" -> Res.drawable._9_of_hearts
+            else -> Res.drawable._9_of_spades
+        }
+
+        10 -> when (suit) {
+            "Clubs" -> Res.drawable._10_of_clubs
+            "Diamonds" -> Res.drawable._10_of_diamonds
+            "Hearts" -> Res.drawable._10_of_hearts
+            else -> Res.drawable._10_of_spades
+        }
+
+        11 -> when (suit) {
+            "Clubs" -> Res.drawable.jack_of_clubs2
+            "Diamonds" -> Res.drawable.jack_of_diamonds2
+            "Hearts" -> Res.drawable.jack_of_hearts2
+            else -> Res.drawable.jack_of_spades2
+        }
+
+        12 -> when (suit) {
+            "Clubs" -> Res.drawable.queen_of_clubs2
+            "Diamonds" -> Res.drawable.queen_of_diamonds2
+            "Hearts" -> Res.drawable.queen_of_hearts2
+            else -> Res.drawable.queen_of_spades2
+        }
+
+        13 -> when (suit) {
+            "Clubs" -> Res.drawable.king_of_clubs2
+            "Diamonds" -> Res.drawable.king_of_diamonds2
+            "Hearts" -> Res.drawable.king_of_hearts2
+            else -> Res.drawable.king_of_spades2
+        }
+        else -> Res.drawable.red_joker
     }
+
     var selected by mutableStateOf(false)
     var flipped by mutableStateOf(false)
 
@@ -60,11 +144,12 @@ class Card(number: Int, type: Int) {
 
     @Composable
     fun display(){
-        Box(Modifier.size(100.dp)) {
-            if (flipped) {
+        Box(Modifier.size(if (selected) 150.dp else 100.dp)) {
+            if (!flipped) {
                 Image(
-                    painterResource(Res.drawable.compose_multiplatform),
-                    contentDescription = ""
+                    painterResource(image),
+                    contentDescription = toString(),
+                    modifier = Modifier.clickable { selected = !selected }
                 )
             } else {
                 Image(
@@ -76,16 +161,17 @@ class Card(number: Int, type: Int) {
     }
 }
 
-
 class Deck {
     var cards by mutableStateOf(emptyArray<Card>())
-    var shuffling by mutableStateOf(false)
+
     fun setupDeck(){
         for (suit in 1..4) {
             for (value in 1..13) {
                 cards += Card(value, suit)
             }
         }
+        cards += Card(14, 14)
+        cards += Card(14, 14)
     }
 
     fun shuffle() {
@@ -108,6 +194,28 @@ fun numToSuit(suit: Int): String {
         1 -> "Clubs"
         2 -> "Diamonds"
         3 -> "Hearts"
-        else -> "Spades"
+        4 -> "Spades"
+        else -> "Joker"
+    }
+}
+
+val mainDeck = Deck()
+var shuffling by mutableStateOf(false)
+@Composable
+fun showDeck(){
+    if (!shuffling) {
+        Column {
+            for (i in 1..4) {
+                Row {
+                    for (j in 1..13) {
+                        mainDeck.cards[(j - 1) + (i - 1) * 13].display()
+                    }
+                }
+            }
+            Row {
+                mainDeck.cards[52].display()
+                mainDeck.cards[53].display()
+            }
+        }
     }
 }
