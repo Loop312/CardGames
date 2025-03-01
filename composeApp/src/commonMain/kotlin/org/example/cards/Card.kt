@@ -150,7 +150,7 @@ class Card(number: Int, type: Int) {
                 )
             } else {
                 Image(
-                    painterResource(Res.drawable.compose_multiplatform),
+                    painterResource(Res.drawable.card_back_red),
                     contentDescription = ""
                 )
             }

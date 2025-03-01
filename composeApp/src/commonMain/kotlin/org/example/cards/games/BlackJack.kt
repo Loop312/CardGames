@@ -9,11 +9,16 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.example.cards.Card
 
 class BlackJack: Game() {
     var refresher by mutableStateOf(true)
     var start by mutableStateOf(true)
+    var buttonsClickable by mutableStateOf(true)
     override val name = "BlackJack"
 
     var playerHand = mutableListOf<Card>()
@@ -37,7 +42,7 @@ class BlackJack: Game() {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 if (refresher) {
 
-                    mainDeck.showDeck()
+                    mainDeck.showFaceDownDeck()
                     //dealer hand
                     Row(Modifier.align(Alignment.TopCenter)) {
                         for (card in dealerHand) {
@@ -66,12 +71,17 @@ class BlackJack: Game() {
                 }
                 //hit or stand buttons
                 Column {
-                    Button(onClick = { hit() }) {
-                        Text(if (hit) "Hit" else "Deal")
-                    }
-                    if (hit) {
-                        Button(onClick = { stand() }) {
-                            Text("Stand")
+                    if (buttonsClickable) {
+                        //hit
+                        Button(onClick = { hit() }) {
+                            Text(if (hit) "Hit" else "Deal")
+                        }
+                        //if already hit
+                        if (hit) {
+                            //stand
+                            Button(onClick = { stand() }) {
+                                Text("Stand")
+                            }
                         }
                     }
                 }
@@ -140,21 +150,32 @@ class BlackJack: Game() {
     }
 
     fun hit() {
-        dealCards(playerHand)
-        if (dealerHandValue < 17) dealCards(dealerHand)
-        hit = true
-        mainDeck.shuffling = !mainDeck.shuffling
-        mainDeck.shuffling = !mainDeck.shuffling
-        refresh()
+        CoroutineScope(Dispatchers.Default).launch {
+            buttonsClickable = false
+            dealCards(playerHand)
+            delay(500)
+            if (dealerHandValue < 17) dealCards(dealerHand)
+            hit = true
+            mainDeck.shuffling = !mainDeck.shuffling
+            mainDeck.shuffling = !mainDeck.shuffling
+            buttonsClickable = true
+            refresh()
 
-        if (playerHandValue > 21 || dealerHandValue > 21) {
-            stand()
+            if (playerHandValue > 21 || dealerHandValue > 21) {
+                stand()
+            }
         }
     }
     fun stand() {
-        while (dealerHandValue < 17) dealCards(dealerHand)
-        hit = false
-        reset()
+        CoroutineScope(Dispatchers.Default).launch {
+            while (dealerHandValue < 17) {
+                dealCards(dealerHand)
+                delay(1000)
+            }
+            delay(1000)
+            hit = false
+            reset()
+        }
     }
 
     fun calculateCardCounter() {
