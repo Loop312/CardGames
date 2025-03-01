@@ -161,34 +161,6 @@ class Card(number: Int, type: Int) {
     }
 }
 
-class Deck {
-    var cards by mutableStateOf(emptyArray<Card>())
-
-    fun setupDeck(){
-        for (suit in 1..4) {
-            for (value in 1..13) {
-                cards += Card(value, suit)
-            }
-        }
-        cards += Card(14, 14)
-        cards += Card(14, 14)
-    }
-
-    fun shuffle() {
-        shuffling = true
-        cards.shuffle()
-        println(cards.contentToString())
-        shuffling = false
-    }
-
-    @Composable
-    fun displayAsText(){
-        if (!shuffling) {
-            Text(cards.contentToString())
-        }
-    }
-}
-
 fun numToSuit(suit: Int): String {
     return when (suit) {
         1 -> "Clubs"
@@ -196,26 +168,5 @@ fun numToSuit(suit: Int): String {
         3 -> "Hearts"
         4 -> "Spades"
         else -> "Joker"
-    }
-}
-
-val mainDeck = Deck()
-var shuffling by mutableStateOf(false)
-@Composable
-fun showDeck(){
-    if (!shuffling) {
-        Column {
-            for (i in 1..4) {
-                Row {
-                    for (j in 1..13) {
-                        mainDeck.cards[(j - 1) + (i - 1) * 13].display()
-                    }
-                }
-            }
-            Row {
-                mainDeck.cards[52].display()
-                mainDeck.cards[53].display()
-            }
-        }
     }
 }

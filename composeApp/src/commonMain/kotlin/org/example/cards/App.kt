@@ -10,19 +10,48 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import org.example.cards.games.*
 import org.jetbrains.compose.ui.tooling.preview.Preview
+
+
+val BlackJack = BlackJack()
+val Duel52 = Duel52()
+val President = President()
+val CrazyEights = CrazyEights()
+val RatScrew = RatScrew()
+val Regicide = Regicide()
+
+val games = arrayOf(BlackJack, Duel52, President, CrazyEights, RatScrew, Regicide)
+var playing = false
+
+val testingDeck = true
 
 @Composable
 @Preview
 fun App() {
-    mainDeck.setupDeck()
+    testDeck.setupDeck()
     Box(Modifier.fillMaxSize().background(Color.DarkGray)){
-        Column(modifier = Modifier.fillMaxWidth()) {
-            mainDeck.displayAsText()
-            Button(onClick = {mainDeck.shuffle()}) {
-                Text("Shuffle")
+        if (testingDeck) {
+            //home menu
+            if (!playing) {
+                Column {
+                    for (i in 1..games.size) {
+                        Button(onClick = { games[i - 1].play() }) {
+                            Text(games[i - 1].name)
+                        }
+                    }
+                }
             }
-            showDeck()
+        }
+
+        else {
+            Column(modifier = Modifier.fillMaxWidth()) {
+                testDeck.displayAsText()
+                Button(onClick = { testDeck.shuffle() }) {
+                    Text("Shuffle")
+                }
+                showDeck()
+            }
         }
     }
 }
