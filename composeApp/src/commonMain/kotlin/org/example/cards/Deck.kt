@@ -12,6 +12,7 @@ class Deck {
     //var cards by mutableStateOf(emptyArray<Card>())
     var hasJoker by mutableStateOf(false)
     var cards = mutableListOf<Card>()
+    var shuffling by mutableStateOf(false)
 
     fun setupDeck(){
         cards = mutableListOf()
@@ -45,32 +46,45 @@ class Deck {
     fun handCard(): Card {
         if (cards.isEmpty()) {
             println("Deck is empty")
-            setupDeck()
         }
         return cards.removeAt(0)
     }
-}
 
-val testDeck = Deck()
-var shuffling by mutableStateOf(false)
+    @Composable
+    fun showDeck(){
+        var rows = minOf(13, cards.size)
+        var columns = if (cards.size > 1) (cards.size + rows - 1) / rows // Ceiling division
+        else 1
 
-@Composable
-fun showDeck(){
-    if (!shuffling) {
-        Column {
-            for (i in 1..4) {
-                Row {
-                    for (j in 1..13) {
-                        testDeck.cards[(j - 1) + (i - 1) * 13].display()
+        // Optimize for a more square-like layout if possible
+        while (columns > 1 && (rows - 1) * columns >= cards.size) {
+            columns--
+            rows = (cards.size + columns - 1) / columns
+        }
+        if (!shuffling) {
+            Column {
+                for (i in 1..columns) {
+                    Row {
+                        for (j in 1..rows) {
+                            val index = (j - 1) + (i - 1) * rows
+                            if (index < cards.size - (if(hasJoker) 2 else 0)) {
+                                cards[index].display()
+                            }
+                        }
                     }
                 }
-            }
-            if (testDeck.hasJoker) {
-                Row {
-                    testDeck.cards[52].display()
-                    testDeck.cards[53].display()
+                if (hasJoker) {
+                    Row {
+                        cards[52].display()
+                        cards[53].display()
+                    }
                 }
             }
         }
     }
+
+    override fun toString(): String {
+        return "$cards"
+    }
 }
+val testDeck = Deck()

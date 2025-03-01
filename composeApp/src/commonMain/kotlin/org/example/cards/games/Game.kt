@@ -8,6 +8,7 @@ open class Game {
     open val name = ""
     var mainDeck = Deck()
 
+    @Composable
     open fun play() {
         mainDeck.setupDeck()
     }

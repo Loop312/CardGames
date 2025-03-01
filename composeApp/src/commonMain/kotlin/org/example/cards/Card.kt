@@ -3,10 +3,7 @@ package org.example.cards
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -25,20 +22,20 @@ class Card(number: Int, type: Int) {
     }
     //setup values
     val value = when (number) {
-        1 -> "A"
-        2 -> "2"
-        3 -> "3"
-        4 -> "4"
-        5 -> "5"
-        6 -> "6"
-        7 -> "7"
-        8 -> "8"
-        9 -> "9"
-        10 -> "10"
-        11 -> "J"
-        12 -> "Q"
-        13 -> "K"
-        else -> "Joker"
+        1 -> Pair(1,"A")
+        2 -> Pair(2,"2")
+        3 -> Pair(3,"3")
+        4 -> Pair(4,"4")
+        5 -> Pair(5,"5")
+        6 -> Pair(6,"6")
+        7 -> Pair(7,"7")
+        8 -> Pair(8,"8")
+        9 -> Pair(9,"9")
+        10 -> Pair(10,"10")
+        11 -> Pair(11,"J")
+        12 -> Pair(12,"Q")
+        13 -> Pair(13,"K")
+        else -> Pair(14,"Joker")
     }
     //setup images
     val image = when (number) {
@@ -139,12 +136,12 @@ class Card(number: Int, type: Int) {
     var flipped by mutableStateOf(false)
 
     override fun toString(): String {
-        return "$value of $suitSign"
+        return "${value.second} of $suitSign"
     }
 
     @Composable
     fun display(){
-        Box(Modifier.size(if (selected) 150.dp else 100.dp)) {
+        Box(Modifier.size(if (selected) 125.dp else 100.dp)) {
             if (!flipped) {
                 Image(
                     painterResource(image),
