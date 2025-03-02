@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -27,6 +28,9 @@ var playing = false
 
 val testingDeck = false
 
+var finalScore = mutableListOf<Int>(0,0)
+var lastGameScore = mutableListOf<Int>(0,0)
+
 @Composable
 @Preview
 fun App() {
@@ -41,6 +45,10 @@ fun App() {
                             Text(games[i - 1].name)
                         }
                     }
+                }
+                Column(modifier = Modifier.align(Alignment.Center)) {
+                    Text("Score: ${finalScore[0]}-${finalScore[1]}")
+                    Text("Last game score: ${lastGameScore[0]}-${lastGameScore[1]}")
                 }
             }
             for (game in games) {

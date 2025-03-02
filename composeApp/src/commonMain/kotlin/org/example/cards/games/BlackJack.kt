@@ -14,10 +14,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.example.cards.Card
+import org.example.cards.finalScore
+import org.example.cards.lastGameScore
+import org.example.cards.playing
 
 class BlackJack: Game() {
     var refresher by mutableStateOf(true)
-    var start by mutableStateOf(true)
+    var restart by mutableStateOf(true)
     var buttonsClickable by mutableStateOf(true)
     override val name = "BlackJack"
 
@@ -33,10 +36,17 @@ class BlackJack: Game() {
 
     @Composable
     override fun play() {
-        if (start) {
+        if (restart) {
+            playerHand = mutableListOf()
+            dealerHand = mutableListOf()
+            playerHandValue = 0
+            dealerHandValue = 0
+            playerScore = 0
+            dealerScore = 0
+            hit = false
             mainDeck.setupDeck()
             mainDeck.shuffle()
-            start = false
+            restart = false
         }
         if (playingGame) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -69,7 +79,7 @@ class BlackJack: Game() {
                         Text("Card counter (Hi-Lo): $cardCounter")
                     }
                 }
-                //hit or stand buttons
+                //hit and stand buttons
                 Column {
                     if (buttonsClickable) {
                         //hit
@@ -90,16 +100,30 @@ class BlackJack: Game() {
     }
 
     fun dealCards(hand: MutableList<Card>) {
-        hand += mainDeck.handCard()
-
-        if (hand.size == 1) {
+        try {
             hand += mainDeck.handCard()
+
+            if (hand.size == 1) {
+                hand += mainDeck.handCard()
+            }
+            playerHandValue = calculateHandValue(playerHand)
+            dealerHandValue = calculateHandValue(dealerHand)
+            refresh()
+            println("dealer hand: $dealerHand")
+            println("player hand: $playerHand")
+            println("$mainDeck")
+        } catch (e: Exception) {
+            println(e)
+            finalScore[0] += if (playerScore > dealerScore) 1 else 0
+            finalScore[1] += if (playerScore < dealerScore) 1 else 0
+            lastGameScore[0] = playerScore
+            lastGameScore[1] = dealerScore
+
+            playingGame = false
+            playing = false
+
+            restart = true
         }
-        playerHandValue = calculateHandValue(playerHand)
-        dealerHandValue = calculateHandValue(dealerHand)
-        println("dealer hand: $dealerHand")
-        println("player hand: $playerHand")
-        println("$mainDeck")
     }
 
     fun calculateHandValue(hand: MutableList<Card>): Int {
@@ -110,21 +134,14 @@ class BlackJack: Game() {
                 aces++
             }
             else {
-                value += if (card.value.first > 10) 10 else if (card.value.first == 1) 0 else card.value.first
+                value += if (card.value.first > 10) 10 else card.value.first
             }
-
-            for(i in 1..aces) {
-                if (aces > 1) {
-                    value += 1
-                }
-                else {
-                    if (value + 11 > 21){
-                        value += 1
-                    }
-                    else {
-                        value += 11
-                    }
-                }
+        }
+        for(i in 1..aces) {
+            if (value + 11 <= 21) {
+                value += 11
+            } else {
+                value += 1
             }
         }
         return value
@@ -139,6 +156,7 @@ class BlackJack: Game() {
         playerHandValue = 0
         dealerHandValue = 0
         hit = false
+        buttonsClickable = true
 
         refresh()
     }
@@ -168,6 +186,7 @@ class BlackJack: Game() {
     }
     fun stand() {
         CoroutineScope(Dispatchers.Default).launch {
+            buttonsClickable = false
             while (dealerHandValue < 17) {
                 dealCards(dealerHand)
                 delay(1000)
